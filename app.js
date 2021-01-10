@@ -9,11 +9,13 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
+const Employee = require("./lib/Employee");
 
 
 const newManager = new Manager();
 const newIntern = new Intern();
 const newEngineer = new Engineer("Mark");
+const newEmployee = new Employee("Mark");
 
 console.log(newEngineer.getName());
 console.log(newEngineer.getRole());
