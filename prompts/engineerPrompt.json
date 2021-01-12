@@ -1,0 +1,22 @@
+[
+    {
+        "type": "input",
+        "message": "Enter the engineer's name:",
+        "name": "name"
+    },
+    {
+        "type": "number",
+        "message": "Enter the engineer's employee ID number: ",
+        "name": "id"
+    },
+    {
+        "type": "input",
+        "message": "Enter the engineer's e-mail address: ",
+        "name": "email"
+    },
+    {
+        "type": "input",
+        "message": "Enter the engineer's github username: ",
+        "name": "github"
+    }
+]
