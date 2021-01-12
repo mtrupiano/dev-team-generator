@@ -2,21 +2,21 @@
     {
         "type": "input",
         "message": "Enter the team manager's name:",
-        "name": "mngrName"
+        "name": "name"
     },
     {
         "type": "number",
         "message": "Enter the team manager's employee ID number: ",
-        "name": "mngrID"
+        "name": "id"
     },
     {
         "type": "input",
         "message": "Enter the team manager's e-mail address: ",
-        "name": "mngrEmail"
+        "name": "email"
     },
     {
         "type": "number",
         "message": "Enter the team manager's office number: ",
-        "name": "mngrOfficeNum"
+        "name": "officeNum"
     }
 ]

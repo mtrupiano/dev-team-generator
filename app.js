@@ -21,8 +21,8 @@ const { restoreDefaultPrompts } = require("inquirer");
 const mngrInput = async function() {
     const answers = await inquirer.prompt(managerPrompt);
 
-    if (answers.mngrID < 1 || answers.mngrID.isNaN() || answers.mngrOfficeNum < 1 || answers.mngrOfficeNum.isNaN()) {
-        if (answers.mngrID < 1 || answers.mngrID.isNaN()) {
+    if (answers.id < 1 || answers.officeNum < 1) {
+        if (answers.mngrID < 1) {
             console.log("ERR: Invalid input for manager employee ID number.");
         } else {
             console.log("ERR: Invalid input for manager office number.");
@@ -31,7 +31,7 @@ const mngrInput = async function() {
         return; 
     }
 
-    if (answers.mngrName === "" || answers.mngrEmail === "") { 
+    if (answers.name === "" || answers.email === "") { 
         if (answers.mngrName === "") {
             console.log("ERR: Invalid input for manager name.");
         } else {
@@ -40,14 +40,29 @@ const mngrInput = async function() {
         mngrInput(); 
         return;
     }
+
+    const output = [new Manager(answers.name, answers.id, answers.email, answers.officeNum)];
     
-    const output = await engineerInput( [ new Manager(answers.mngrName,
-                                                    answers.mngrID,
-                                                    answers.mngrEmail,
-                                                    answers.mngrOfficeNum) ] );
-    
-    console.log(output);
-    
+    const anyEngineersPrompt = await inquirer.prompt([{
+        type:"confirm",
+        message: "Are there any engineers on your team?",
+        name: "anyEngineers"
+    }]);
+
+    if (anyEngineersPrompt.anyEngineers) {
+        await engineerInput(output);  
+    } else {
+        const anyInternsPrompt = await inquirer.prompt([{
+            type: "confirm",
+            message: "Are there any interns on your team?",
+            name: "anyInterns"
+        }]);
+
+        if (anyInternsPrompt.anyInterns) {
+            await internInput(output); 
+        } 
+    }
+      
     const htmlStr = render(output);
 
     if (!fs.existsSync(OUTPUT_DIR)) {
@@ -62,7 +77,7 @@ const mngrInput = async function() {
 const engineerInput = async function(input = []) {
     const answers = await inquirer.prompt(engineerPrompt);
 
-    if (answers.id < 1 || answers.id.isNaN()) {
+    if (answers.id < 1) {
         console.log("ERR: Invalid input for employee ID number.");
         await engineerInput(input);
         return input;
@@ -71,7 +86,7 @@ const engineerInput = async function(input = []) {
     if (answers.name === "" || answers.email === "" || answers.school === "") {
         if (answers.name === "") {
             console.log("ERR: Invalid input for employee name.")
-        }
+        } 
 
         await engineerInput(input);
         return input;
@@ -87,9 +102,19 @@ const engineerInput = async function(input = []) {
 
     if (addAnother.addAnother) {
         await engineerInput(input);
+        return;
     }
 
-    await internInput(input);
+    const anyInternsPrompt = await inquirer.prompt([{
+        type: "confirm",
+        message: "Are there any interns on your team?",
+        name: "anyInterns"
+    }]);
+
+    if (anyInternsPrompt.anyInterns) {
+        await internInput(input);
+    }
+
     return input;
 }
 
@@ -97,7 +122,7 @@ const internInput = async function(input = []) {
 
     const answers = await inquirer.prompt(internPrompt);
 
-    if (answers.id < 1 || answers.id.isNaN()) {
+    if (answers.id < 1) {
         console.log("ERR: Invalid input for employee ID number.");
         await internInput(input);
         return input; 
