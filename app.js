@@ -16,11 +16,14 @@ const internPrompt = require("./prompts/internPrompt.json");
 const engineerPrompt = require("./prompts/engineerPrompt.json");
 const { restoreDefaultPrompts } = require("inquirer");
 
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
+/**
+ * Construct a manager employee based on user input (via inquirer); will also
+ *      trigger the prompts to create engineers and interns (if any).
+ */
 const mngrInput = async function() {
     const answers = await inquirer.prompt(managerPrompt);
 
+    // Validate numeric inputs
     if (answers.id < 1 || answers.officeNum < 1) {
         if (answers.mngrID < 1) {
             console.log("ERR: Invalid input for manager employee ID number.");
@@ -31,6 +34,7 @@ const mngrInput = async function() {
         return; 
     }
 
+    // Validate string inputs
     if (answers.name === "" || answers.email === "") { 
         if (answers.mngrName === "") {
             console.log("ERR: Invalid input for manager name.");
@@ -43,12 +47,15 @@ const mngrInput = async function() {
 
     const output = [new Manager(answers.name, answers.id, answers.email, answers.officeNum)];
     
+    // Ask if there are any engineer employees to add
     const anyEngineersPrompt = await inquirer.prompt([{
         type:"confirm",
         message: "Are there any engineers on your team?",
         name: "anyEngineers"
     }]);
 
+    // If there are engineer employees to add, run the engineer prompt~~
+    // Otherwise, ask if there are any intern employees to add and run that prompt
     if (anyEngineersPrompt.anyEngineers) {
         await engineerInput(output);  
     } else {
@@ -62,7 +69,9 @@ const mngrInput = async function() {
             await internInput(output); 
         } 
     }
-      
+    
+    // Render all of the constructed employees to an HTML file and save that to
+    // the 'output' directory
     const htmlStr = render(output);
 
     if (!fs.existsSync(OUTPUT_DIR)) {
@@ -74,7 +83,12 @@ const mngrInput = async function() {
     });
 }
 
-const engineerInput = async function(input = []) {
+/**
+ * Recursive function to collect input for creating engineer employees
+ *
+ * @param {*} input     Array to store constructed employees
+ */
+const engineerInput = async function( input = [] ) {
     const answers = await inquirer.prompt(engineerPrompt);
 
     if (answers.id < 1) {
@@ -118,6 +132,11 @@ const engineerInput = async function(input = []) {
     return input;
 }
 
+/**
+ * Recursive function to collect input for creating intern employees
+ * 
+ * @param {*} input     Array to store constructed employees
+ */
 const internInput = async function(input = []) {
 
     const answers = await inquirer.prompt(internPrompt);
