@@ -16,6 +16,8 @@ const internPrompt = require("./prompts/internPrompt.json");
 const engineerPrompt = require("./prompts/engineerPrompt.json");
 const { restoreDefaultPrompts } = require("inquirer");
 
+let emailRegEx = new RegExp(".{1,}(@)[^.]{1,}(\.)[^.]{1,}$");
+
 /**
  * Construct a manager employee based on user input (via inquirer); will also
  * trigger the prompts to create engineers and interns (if any).
@@ -24,19 +26,22 @@ const mngrInput = async function() {
     const answers = await inquirer.prompt(managerPrompt);
 
     // Validate numeric inputs
-    if (answers.id < 1 || answers.officeNum < 1) {
-        if (answers.mngrID < 1) {
+    if (answers.id < 1 || isNaN(answers.id) || 
+        answers.officeNum < 1 || isNaN(answers.officeNum)) {
+
+        if (answers.id < 1 || isNaN(answers.id)) {
             console.log("ERR: Invalid input for manager employee ID number.");
         } else {
             console.log("ERR: Invalid input for manager office number.");
         }
+        
         mngrInput(); 
         return; 
     }
 
     // Validate string inputs
-    if (answers.name === "" || answers.email === "") { 
-        if (answers.mngrName === "") {
+    if (answers.name === "" || answers.email === "" || !(emailRegEx.test(answers.email))) { 
+        if (answers.name === "") {
             console.log("ERR: Invalid input for manager name.");
         } else {
             console.log("ERR: Invalid input for manager e-mail.");
@@ -93,17 +98,23 @@ const engineerInput = async function( input = [] ) {
     const answers = await inquirer.prompt(engineerPrompt);
 
     // Validate numeric input
-    if (answers.id < 1) {
+    if (answers.id < 1 || isNaN(answers.id)) {
         console.log("ERR: Invalid input for employee ID number.");
         await engineerInput(input);
         return input;
     } 
 
     // Validate string inputs
-    if (answers.name === "" || answers.email === "" || answers.school === "") {
+    if (answers.name === "" || answers.email === "" || 
+        !(emailRegEx.test(answers.email)) || answers.github === "") {
+
         if (answers.name === "") {
             console.log("ERR: Invalid input for employee name.")
-        } 
+        } else if (answers.github === "") {
+            console.log("ERR: Invalid input for engineer's github username.")
+        } else {
+            console.log("ERR: Invalid input for employee's email.")
+        }
 
         await engineerInput(input);
         return input;
@@ -147,19 +158,24 @@ const internInput = async function( input = [] ) {
     const answers = await inquirer.prompt(internPrompt);
 
     // Validate numeric input
-    if (answers.id < 1) {
+    if (answers.id < 1 || isNaN(answers.id)) {
         console.log("ERR: Invalid input for employee ID number.");
         await internInput(input);
         return input; 
     }
 
     // Validate string inputs
-    if (answers.name === "" || answers.email === "" || answers.school === "") {
+    if (answers.name === "" || answers.email === "" || 
+        !(emailRegEx.test(answers.email)) || answers.school === "") {
+
         if (answers.name === "") {
             console.log("ERR: Invalid input for employee name.");
+        } else if (answers.school === "") {
+            console.log("ERR: Invalid input for inter's school name.");
         } else {
             console.log("ERR: Invalid input for employee e-mail.");
         }
+
         await internInput(input);
         return input;
     }
