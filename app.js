@@ -17,6 +17,54 @@ const newIntern = new Intern("Mark", 22, "mark@gmail.com", "UW");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+const managerPrompt = 
+[{
+    "type": "input",
+    "message": "Enter the team manager's name:",
+    "name": "mngrName"
+}, {
+    "type": "number",
+    "message": "Enter the team manager's employee ID number: ",
+    "name": "mngrID"
+}, {
+    "type": "input",
+    "message": "Enter the team manager's e-mail address: ",
+    "name": "mngrEmail"
+}, {
+    "type": "number",
+    "message": "Enter the team manager's office number: ",
+    "name": "mngrOfficeNum"
+}];
+
+const mngrInput = async function() {
+    const answers = await inquirer.prompt(managerPrompt);
+
+    if (answers.mngrID < 1 || answers.mngrOfficeNum < 1) {
+        if (answers.mngrID < 1) {
+            console.log("ERR: Invalid input for manager employee ID number.");
+        } else {
+            console.log("ERR: Invalid input for manager office number.");
+        }
+        mngrInput(); 
+        return; 
+    }
+
+    if (answers.mngrName === "" || answers.mngrEmail === "") { 
+        if (answers.mngrName === "") {
+            console.log("ERR: Invalid input for manager name.");
+        } else {
+            console.log("ERR: Invalid input for manager e-mail.");
+        }
+        mngrInput(); 
+        return;
+    }
+
+    const manager = new Manager(answers.mngrName, answers.mngrID, answers.mngrEmail, answers.mngrOfficeNum);
+    console.log(manager);
+}
+
+mngrInput();
+
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
