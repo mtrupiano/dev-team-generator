@@ -18,7 +18,7 @@ const { restoreDefaultPrompts } = require("inquirer");
 
 /**
  * Construct a manager employee based on user input (via inquirer); will also
- *      trigger the prompts to create engineers and interns (if any).
+ * trigger the prompts to create engineers and interns (if any).
  */
 const mngrInput = async function() {
     const answers = await inquirer.prompt(managerPrompt);
@@ -89,14 +89,17 @@ const mngrInput = async function() {
  * @param {*} input     Array to store constructed employees
  */
 const engineerInput = async function( input = [] ) {
+
     const answers = await inquirer.prompt(engineerPrompt);
 
+    // Validate numeric input
     if (answers.id < 1) {
         console.log("ERR: Invalid input for employee ID number.");
         await engineerInput(input);
         return input;
     } 
 
+    // Validate string inputs
     if (answers.name === "" || answers.email === "" || answers.school === "") {
         if (answers.name === "") {
             console.log("ERR: Invalid input for employee name.")
@@ -108,6 +111,7 @@ const engineerInput = async function( input = [] ) {
 
     input.push(new Engineer(answers.name, answers.id, answers.email, answers.github));
 
+    // Prompt to add another engineer
     const addAnother = await inquirer.prompt([{
         type: "confirm",
         message: "Add another engineer?",
@@ -119,6 +123,7 @@ const engineerInput = async function( input = [] ) {
         return;
     }
 
+    // Prompt to add any interns
     const anyInternsPrompt = await inquirer.prompt([{
         type: "confirm",
         message: "Are there any interns on your team?",
@@ -137,16 +142,18 @@ const engineerInput = async function( input = [] ) {
  * 
  * @param {*} input     Array to store constructed employees
  */
-const internInput = async function(input = []) {
+const internInput = async function( input = [] ) {
 
     const answers = await inquirer.prompt(internPrompt);
 
+    // Validate numeric input
     if (answers.id < 1) {
         console.log("ERR: Invalid input for employee ID number.");
         await internInput(input);
         return input; 
     }
 
+    // Validate string inputs
     if (answers.name === "" || answers.email === "" || answers.school === "") {
         if (answers.name === "") {
             console.log("ERR: Invalid input for employee name.");
@@ -159,6 +166,7 @@ const internInput = async function(input = []) {
 
     input.push(new Intern(answers.name, answers.id, answers.email, answers.school));
 
+    // Prompt to add another intern
     const addAnother = await inquirer.prompt([{
         type: "confirm",
         message: "Add another intern?",
@@ -170,28 +178,6 @@ const internInput = async function(input = []) {
     }
 
     return input;
-    
 }
 
 mngrInput();
-
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-// const htmlStr = render(employeeList);
-
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work! ```
