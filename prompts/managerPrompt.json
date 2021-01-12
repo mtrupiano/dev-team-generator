@@ -1,0 +1,22 @@
+[
+    {
+        "type": "input",
+        "message": "Enter the team manager's name:",
+        "name": "mngrName"
+    },
+    {
+        "type": "number",
+        "message": "Enter the team manager's employee ID number: ",
+        "name": "mngrID"
+    },
+    {
+        "type": "input",
+        "message": "Enter the team manager's e-mail address: ",
+        "name": "mngrEmail"
+    },
+    {
+        "type": "number",
+        "message": "Enter the team manager's office number: ",
+        "name": "mngrOfficeNum"
+    }
+]

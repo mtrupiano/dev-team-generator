@@ -11,36 +11,22 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
 const Employee = require("./lib/Employee");
+const managerPrompt = require("./prompts/managerPrompt.json");
+const internPrompt = require("./prompts/internPrompt.json");
+const { restoreDefaultPrompts } = require("inquirer");
 
 const newManager = new Manager("Joe", 5, "joe@gmail.com", 20);
 const newIntern = new Intern("Mark", 22, "mark@gmail.com", "UW");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
-const managerPrompt = 
-[{
-    "type": "input",
-    "message": "Enter the team manager's name:",
-    "name": "mngrName"
-}, {
-    "type": "number",
-    "message": "Enter the team manager's employee ID number: ",
-    "name": "mngrID"
-}, {
-    "type": "input",
-    "message": "Enter the team manager's e-mail address: ",
-    "name": "mngrEmail"
-}, {
-    "type": "number",
-    "message": "Enter the team manager's office number: ",
-    "name": "mngrOfficeNum"
-}];
+
 
 const mngrInput = async function() {
     const answers = await inquirer.prompt(managerPrompt);
 
-    if (answers.mngrID < 1 || answers.mngrOfficeNum < 1) {
-        if (answers.mngrID < 1) {
+    if (answers.mngrID < 1 || answers.mngrID.isNaN() || answers.mngrOfficeNum < 1) {
+        if (answers.mngrID < 1 || answers.mngrID.isNaN()) {
             console.log("ERR: Invalid input for manager employee ID number.");
         } else {
             console.log("ERR: Invalid input for manager office number.");
@@ -58,18 +44,80 @@ const mngrInput = async function() {
         mngrInput(); 
         return;
     }
+    
+    const output = await internInput( [ new Manager(answers.mngrName,
+                                                    answers.mngrID,
+                                                    answers.mngrEmail,
+                                                    answers.mngrOfficeNum) ] );
+    
+    console.log(output);
+    
+    const htmlStr = render(output);
 
-    const manager = new Manager(answers.mngrName, answers.mngrID, answers.mngrEmail, answers.mngrOfficeNum);
-    console.log(manager);
+    if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR);
+    }
+
+    fs.writeFile(outputPath, htmlStr, (err) => {
+        if (err) { console.log(err); }
+    });
+}
+
+const engineerInput = async function(input = []) {
+    const answers = await inquirer.prompt(engineerPrompt);
+
+    if (answers.id < 1) {
+        console.log("ERR: Invalid input for employee ID number.");
+        engineerInput(input);
+        return;
+    } 
+}
+
+const internInput = async function(input = []) {
+
+    const answers = await inquirer.prompt(internPrompt);
+
+    if (answers.id < 1 || answers.id.isNaN()) {
+        console.log("ERR: Invalid input for employee ID number.");
+        await internInput(input);
+        return input; 
+    }
+
+    if (answers.name === "" || answers.email === "" || answers.school === "") {
+        if (answers.name === "") {
+            console.log("ERR: Invalid input for employee name.");
+        } else {
+            console.log("ERR: Invalid input for employee e-mail.");
+        }
+        await internInput(input);
+        return input;
+    }
+
+    input.push(new Intern(answers.name, answers.id, answers.email, answers.school));
+
+    const addAnother = await inquirer.prompt([{
+        type: "confirm",
+        message: "Add another intern?",
+        name: "addAnother"
+    }]);
+
+    if (addAnother.addAnother) {
+        await internInput(input); 
+    }
+
+    return input;
+    
 }
 
 mngrInput();
+
+// const employeeList = mngrInput();
 
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
-const htmlStr = render([newManager, newIntern]);
+// const htmlStr = render(employeeList);
 
 // After you have your html, you're now ready to create an HTML file using the HTML
 // returned from the `render` function. Now write it to a file named `team.html` in the
@@ -77,13 +125,13 @@ const htmlStr = render([newManager, newIntern]);
 // Hint: you may need to check if the `output` folder exists and create it if it
 // does not.
 
-if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR);
-}
+// if (!fs.existsSync(OUTPUT_DIR)) {
+//     fs.mkdirSync(OUTPUT_DIR);
+// }
 
-fs.writeFile(outputPath, htmlStr, (err) =>  {
-    if (err) { console.log(err); }
-});
+// fs.writeFile(outputPath, htmlStr, (err) =>  {
+//     if (err) { console.log(err); }
+// });
 
 // HINT: each employee type (manager, engineer, or intern) has slightly different
 // information; write your code to ask different questions via inquirer depending on
