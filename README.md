@@ -9,7 +9,7 @@ Clone the source repository and run 'npm i' in the local directory.
 ## Usage
  - Run the application by entering 'node app.js' in the repo's local directory.
  - Enter the information of all employees you wish to add.
- - View the dev team by opening the rendered html file (located at in the source code's directory at ./output/team.html).
+ - View the dev team by opening the rendered html file (located in the source code's directory at ./output/team.html).
 
 See attached video for a recorded demonstration:
 
